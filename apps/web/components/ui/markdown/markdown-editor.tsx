@@ -2,15 +2,20 @@ import React, { memo, useCallback, useMemo } from "react";
 import ToolbarPlugin from "@/components/ui/markdown/plugins/toolbar-plugin";
 import { UpdateMarkdownPlugin } from "@/components/ui/markdown/plugins/update-markdown-editor-plugin";
 import { MarkdownEditorTheme } from "@/components/ui/markdown/theme/theme";
-import { CodeNode } from "@lexical/code";
+import {
+  CodeHighlightNode,
+  CodeNode,
+  registerCodeHighlighting,
+} from "@lexical/code";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
+  CHECK_LIST,
   TRANSFORMERS,
 } from "@lexical/markdown";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import {
   InitialConfigType,
   LexicalComposer,
@@ -18,12 +23,15 @@ import {
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { EditorState } from "lexical";
+import { EditorState, LexicalEditor } from "lexical";
 
 function onError(error: Error) {
   console.error(error);
@@ -36,6 +44,8 @@ const EDITOR_NODES = [
   QuoteNode,
   LinkNode,
   CodeNode,
+  CodeHighlightNode,
+  HorizontalRuleNode,
 ];
 
 interface MarkdownEditorProps {
@@ -44,6 +54,7 @@ interface MarkdownEditorProps {
   readonly?: boolean;
 }
 
+const transformers = [...TRANSFORMERS, CHECK_LIST];
 const MarkdownEditor = memo(
   ({
     children: initialMarkdown,
@@ -57,8 +68,10 @@ const MarkdownEditor = memo(
         editable: !readonly,
         theme: MarkdownEditorTheme,
         nodes: EDITOR_NODES,
-        editorState: () =>
-          $convertFromMarkdownString(initialMarkdown, TRANSFORMERS),
+        editorState: (editor: LexicalEditor) => {
+          $convertFromMarkdownString(initialMarkdown, transformers);
+          registerCodeHighlighting(editor);
+        },
       }),
       [readonly, initialMarkdown],
     );
@@ -66,7 +79,7 @@ const MarkdownEditor = memo(
     const handleOnChange = useCallback(
       (editorState: EditorState) => {
         editorState.read(() => {
-          const markdownString = $convertToMarkdownString();
+          const markdownString = $convertToMarkdownString(transformers);
           if (onChangeMarkdown) onChangeMarkdown(markdownString);
         });
       },
@@ -98,12 +111,14 @@ const MarkdownEditor = memo(
         {!readonly && (
           <>
             <HistoryPlugin />
-            <AutoFocusPlugin />
             <TabIndentationPlugin />
             <OnChangePlugin onChange={handleOnChange} />
+            <MarkdownShortcutPlugin transformers={transformers} />
+            <ListPlugin />
+            <CheckListPlugin />
           </>
         )}
-        <UpdateMarkdownPlugin markdown={initialMarkdown} />
+        {readonly && <UpdateMarkdownPlugin markdown={initialMarkdown} />}
       </LexicalComposer>
     );
   },

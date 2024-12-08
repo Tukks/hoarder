@@ -20,12 +20,11 @@ export const MarkdownEditorTheme = {
     ol: "list-decimal pl-4",
     ul: "list-disc pl-4",
     listitem: "ml-8",
-    listitemChecked: "line-through text-gray-600 dark:text-gray-400",
+    listitemChecked:
+      "relative mx-2 px-6 list-none outline-none line-through before:content-[''] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-[#3d87f5] before:rounded before:bg-[#3d87f5] before:bg-no-repeat rtl:before:left-auto rtl:before:right-0 focus:before:shadow-[0_0_0_2px_#a6cdfe] focus:before:rounded after:content-[''] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-1.5 after:w-[3px] after:left-[7px] after:right-[7px] after:h-1.5 after:rotate-45 after:border-r-2 after:border-b-2",
     listitemUnchecked:
-      "ml-2 mr-2 pl-6 pr-6 relative outline-none list-none dark:text-gray-300",
+      "relative mx-2 px-6 list-none outline-none before:content-[''] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-[#999] before:rounded rtl:before:left-auto rtl:before:right-0 focus:before:shadow-[0_0_0_2px_#a6cdfe] focus:before:rounded",
   },
-  hashtag:
-    "bg-blue-100 border-b border-blue-300 dark:bg-blue-900 dark:border-blue-700",
   image: "",
   link: "text-blue-600 no-underline hover:underline cursor-pointer dark:text-blue-400",
   text: {
@@ -82,7 +81,7 @@ export const MarkdownEditorTheme = {
   layoutContainer: "grid gap-2 my-2",
   layoutItem:
     "border border-dashed border-gray-300 px-4 py-2 dark:border-gray-600",
-  hr: "border-none my-4 cursor-pointer",
+  hr: "border border-solid my-4 cursor-pointer",
   hrSelected:
     "outline outline-2 outline-blue-500 select-none dark:outline-blue-400",
   specialText: "bg-yellow-300 font-bold dark:bg-yellow-600 dark:text-black",
